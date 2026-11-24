@@ -52,9 +52,10 @@ A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind
 │   │   └── root-reducer.ts         # Combined slices root reducer
 │   ├── types/                      # Common custom typings
 │   │   └── next-auth.d.ts          # Augmented NextAuth declarations
-│   └── utils/                      # Helper utilities (cookies, url parsing)
+│   └── utils/                      # Helper utilities (dates, paths, formatting)
 ├── components.json                 # Shadcn CLI layout configuration
-└── tsconfig.json                   # Path alias mappings
+├── tsconfig.json                   # Path alias mappings
+└── .env.example                    # Environment variable template
 ```
 
 ---
@@ -66,13 +67,11 @@ A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind
 - npm package manager
 
 ### 2. Environment Variables
-Create a `.env` (or `.env.local`) file in the root folder with the following variables:
+Copy `.env.example` to `.env.local` and fill in the values:
 ```env
 NEXT_PUBLIC_BASE_API_URL=https://api.yourdomain.com/v1
 NEXTAUTH_SECRET=your_nextauth_jwt_signing_secret_here
-NEXT_PUBLIC_ROOT_DOMAIN=yourdomain.com
 ```
-`NEXT_PUBLIC_ROOT_DOMAIN` is optional and only needed if you use subdomain-aware URLs or cookies.
 
 > [!WARNING]
 > Do not commit `.env` or configuration secrets to repository branches. The CI build scan will fail if secrets are checked in.

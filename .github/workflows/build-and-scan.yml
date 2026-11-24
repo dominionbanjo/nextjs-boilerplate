@@ -29,7 +29,7 @@ jobs:
 
       - name: Check for committed env files
         run: |
-          tracked_env="$(git ls-files '.env*')"
+          tracked_env="$(git ls-files '.env*' | grep -vE '(^|/)\.env\.example$' || true)"
           if [ -n "$tracked_env" ]; then
             echo "ERROR: environment files must not be committed:"
             echo "$tracked_env"

@@ -4,7 +4,6 @@ import { Component, ErrorInfo, ReactNode } from "react";
 import Modal from "@/components/shared/modals/Modal";
 import { Button } from "@/components/ui/button";
 import { CloseCircle, Refresh, Global } from "iconsax-react";
-import { getRootUrl } from "@/utils/tenantUrl";
 
 interface TechnicalGlitchModalProps {
   isOpen: boolean;
@@ -59,7 +58,7 @@ export function TechnicalGlitchModal({
           </Button>
           <Button
             variant="outline"
-            onClick={() => (window.location.href = getRootUrl())}
+            onClick={() => (window.location.href = window.location.origin)}
             className="w-full h-12 flex items-center justify-center gap-2 rounded-xl border-gray-200 hover:bg-gray-50"
           >
             <Global size={18} variant="Linear" color="currentColor" />
