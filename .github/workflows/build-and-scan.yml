@@ -1,0 +1,34 @@
+name: Build Check & Security Scan
+
+on:
+  push:
+    branches: [master, main, staging]
+  pull_request:
+    branches: [master, main, staging]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run dependency security audit
+        run: npm audit --audit-level=high
+        continue-on-error: true # Warning only, or change to false to block builds
+
+      - name: Scan for committed secrets and env files
+        run: npm run security-scan
+
+      - name: Build Next.js app
+        run: npm run build

@@ -1,0 +1,29 @@
+{
+  "project": "Next.js Boilerplate",
+  "security_standards": {
+    "dependencies": {
+      "audit_level": "high",
+      "ban_unused": true,
+      "allow_vulnerabilities": false
+    },
+    "secrets": {
+      "prevent_committed_env": true,
+      "banned_patterns": [
+        "NEXTAUTH_SECRET\\s*=\\s*['\"].*['\"]",
+        "PRIVATE_KEY\\s*=\\s*['\"].*['\"]"
+      ]
+    },
+    "static_analysis": {
+      "ban_eval": true,
+      "ban_dangerously_set_inner_html": true,
+      "require_https": true,
+      "allowed_cors_origins": [
+        "localhost"
+      ]
+    },
+    "route_guards": {
+      "require_middleware_protection": true,
+      "require_api_session_auth": true
+    }
+  }
+}
