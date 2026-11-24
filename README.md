@@ -1,6 +1,6 @@
 # Next.js 16 & React 19 Project Boilerplate
 
-A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind CSS v4**, and **TypeScript**. This repository serves as a starting point for new projects, featuring a modular architecture, centralized global state management, automated authentication redirects, unified form wrappers, and integrated security scanners.
+A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind CSS v4**, and **TypeScript**. This repository serves as a starting point for new projects, featuring a modular architecture, centralized global state management, automated authentication redirects, unified form wrappers, and automated CI security checks.
 
 ---
 
@@ -12,7 +12,7 @@ A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind
 - **Tailwind CSS v4 Design System**: curated HSL color palettes, dark mode tokens, scrollbar utilities, and slide-in animations.
 - **Unified Form Component wrappers**: reusable `FormInput` and `FormCheckbox` controls wrapping Zod schema checks and React Hook Form states.
 - **Generalized Routing Guards**: client-side `<ProtectedRoute>` components and a server-side `proxy.ts` interceptor to protect pages and API access.
-- **Automated Security Pipelines**: custom guidelines in `security-rules.json` mapped into a GitHub Actions workflow scanning for hardcoded secrets.
+- **Automated Security Checks**: a GitHub Actions workflow that blocks committed env files, hardcoded secrets, `eval()`, and unsanitized `dangerouslySetInnerHTML`.
 
 ---
 
@@ -54,8 +54,7 @@ A production-ready boilerplate built on **Next.js 16**, **React 19**, **Tailwind
 │   │   └── next-auth.d.ts          # Augmented NextAuth declarations
 │   └── utils/                      # Helper utilities (cookies, url parsing)
 ├── components.json                 # Shadcn CLI layout configuration
-├── tsconfig.json                   # Path alias mappings
-└── security-rules.json             # Project security rules
+└── tsconfig.json                   # Path alias mappings
 ```
 
 ---
@@ -151,10 +150,12 @@ return (
 
 ---
 
-## 🔒 Security Standards (`security-rules.json`)
+## 🔒 Security Checks
 
-The `security-rules.json` file dictates security policies for compilation and commits:
-- **Dependency Audit**: High-level package vulnerability screening.
-- **Secrets Prevention**: Banned code signatures and prevents checking in `.env` configurations.
-- **Static Analysis**: Bans `eval()`, flags unsecured calls, and defines authorized CORS origins.
-- **Pipeline Check**: Verified automatically on every push or PR via the GitHub Actions runner.
+Security is enforced directly by the GitHub Actions workflow on every push and pull request:
+- **Dependency Audit**: `npm audit --audit-level=high` reports vulnerable packages.
+- **Env Files**: Fails if any `.env*` file is tracked by git.
+- **Hardcoded Secrets**: Fails on inline assignments to secret-shaped keys such as `NEXTAUTH_SECRET`, `PRIVATE_KEY`, `API_SECRET`, or `SECRET_KEY`.
+- **`eval()`**: Fails on any use of `eval()`.
+- **HTML Injection**: `dangerouslySetInnerHTML` is allowed only when the file also sanitizes its input (for example with `DOMPurify` or a `sanitize` helper); otherwise the check fails.
+- **Verification**: Type checking, tests, and the production build run in the same workflow.

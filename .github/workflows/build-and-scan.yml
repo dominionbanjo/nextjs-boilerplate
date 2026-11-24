@@ -1,4 +1,4 @@
-name: Build Check & Security Scan
+name: Build, Test & Security Checks
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [master, main, staging]
 
 jobs:
-  build-and-scan:
+  build-and-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,14 +21,50 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run dependency security audit
+      - name: Audit dependencies
         run: npm audit --audit-level=high
-        continue-on-error: true # Warning only, or change to false to block builds
+        continue-on-error: true # Report only; dependency upgrades are reviewed separately
 
-      - name: Scan for committed secrets and env files
-        run: npm run security-scan
+      - name: Check for committed env files
+        run: |
+          tracked_env="$(git ls-files '.env*')"
+          if [ -n "$tracked_env" ]; then
+            echo "ERROR: environment files must not be committed:"
+            echo "$tracked_env"
+            exit 1
+          fi
+
+      - name: Scan for hardcoded secrets
+        run: |
+          if grep -rInE "(NEXTAUTH_SECRET|PRIVATE_KEY|API_SECRET|SECRET_KEY)[[:space:]]*=[[:space:]]*['\"][^'\"]+['\"]" src scripts 2>/dev/null; then
+            echo "ERROR: a possible hardcoded secret was found."
+            exit 1
+          fi
+
+      - name: Block eval usage
+        run: |
+          if grep -rInE '\beval[[:space:]]*\(' src; then
+            echo "ERROR: eval() is not allowed."
+            exit 1
+          fi
+
+      - name: Verify HTML injection is sanitized
+        run: |
+          files="$(grep -rl 'dangerouslySetInnerHTML' src || true)"
+          for file in $files; do
+            if ! grep -qE '(DOMPurify|sanitize|sanitizeHtml)' "$file"; then
+              echo "ERROR: $file uses dangerouslySetInnerHTML without sanitizing the HTML."
+              exit 1
+            fi
+          done
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Run tests
+        run: npm run test:run
 
       - name: Build Next.js app
-        run: npm run build
+        run: npx next build

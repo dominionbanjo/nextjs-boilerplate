@@ -5,8 +5,7 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "dev": "next dev",
-    "security-scan": "node scripts/security-scan.js",
-    "build": "npm run security-scan && npm run type-check && npm run test:run && next build",
+    "build": "npm run type-check && npm run test:run && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
